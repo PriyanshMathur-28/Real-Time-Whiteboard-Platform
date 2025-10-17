@@ -10,7 +10,7 @@ const App = () => {
   const [userNo, setUserNo] = useState(0);
   const [roomJoined, setRoomJoined] = useState(false);
   const [user, setUser] = useState({});
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // State for users list
   const [socket, setSocket] = useState(null);
 
   const uuid = () => {
@@ -20,22 +20,22 @@ const App = () => {
 
   useEffect(() => {
     const serverUrl = process.env.REACT_APP_SERVER_URL || "http://localhost:5000";
-    const wsUrl = serverUrl.replace("http", "ws"); // Convert to wss:// in production
-    const newSocket = io(wsUrl, {
-      transports: ["websocket"],
-      reconnectionAttempts: 5, // Limit retries
-      timeout: 10000,
-    });
+    const wsUrl = serverUrl.replace("http", "ws").replace("https", "wss");
+    const newSocket = io(wsUrl, { transports: ["websocket"], reconnectionAttempts: 5, timeout: 10000 });
     setSocket(newSocket);
 
-    return () => newSocket.close(); // Cleanup on unmount
-  }, []); // Empty dependency array for single initialization
+    // Listen for users event
+    newSocket.on("users", (roomUsers) => {
+      setUsers(roomUsers);
+      setUserNo(roomUsers.length); // Update user count
+    });
+
+    return () => newSocket.close(); // Cleanup
+  }, []);
 
   useEffect(() => {
-    if (roomJoined && socket && user.roomId) {
-      socket.emit("user-joined", user);
-    }
-  }, [roomJoined, user, socket]); // Dependencies updated
+    if (roomJoined && socket && user.roomId) socket.emit("user-joined", user);
+  }, [roomJoined, user, socket]);
 
   return (
     <div className="home">
