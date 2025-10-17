@@ -4,56 +4,38 @@ import io from "socket.io-client";
 import Room from "./Room";
 import JoinCreateRoom from "./JoinCreateRoom";
 import Sidebar from "./Sidebar";
-
 import "./style.css";
-
-const server = "https://real-time-whiteboard-platform.onrender.com" || 'http://localhost:5000';
-const connectionOptions = {
-  "force new connection": true,
-  reconnectionAttempts: "Infinity",
-  timeout: 10000,
-  transports: ["websocket"],
-};
 
 const App = () => {
   const [userNo, setUserNo] = useState(0);
   const [roomJoined, setRoomJoined] = useState(false);
   const [user, setUser] = useState({});
   const [users, setUsers] = useState([]);
-  const [socket, setSocket] = useState(null); // FIXED: Move socket inside
+  const [socket, setSocket] = useState(null);
 
   const uuid = () => {
-    var S4 = () => {
-      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    };
-    return (
-      S4() +
-      S4() +
-      "-" +
-      S4() +
-      "-" +
-      S4() +
-      "-" +
-      S4() +
-      "-" +
-      S4() +
-      S4() +
-      S4()
-    );
+    const S4 = () => (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    return `${S4()}${S4()}-${S4()}-${S4()}-${S4()}-${S4()}${S4()}${S4()}`;
   };
 
   useEffect(() => {
-    const newSocket = io(server, connectionOptions);
+    const serverUrl = process.env.REACT_APP_SERVER_URL || "http://localhost:5000";
+    const wsUrl = serverUrl.replace("http", "ws"); // Convert to wss:// in production
+    const newSocket = io(wsUrl, {
+      transports: ["websocket"],
+      reconnectionAttempts: 5, // Limit retries
+      timeout: 10000,
+    });
     setSocket(newSocket);
 
-    return () => newSocket.close(); // Cleanup
-  }, []);
+    return () => newSocket.close(); // Cleanup on unmount
+  }, []); // Empty dependency array for single initialization
 
   useEffect(() => {
-    if (roomJoined && socket && user.roomId) { // FIXED: Add checks
+    if (roomJoined && socket && user.roomId) {
       socket.emit("user-joined", user);
     }
-  }, [roomJoined, user, socket]); // FIXED: Add dependencies
+  }, [roomJoined, user, socket]); // Dependencies updated
 
   return (
     <div className="home">
@@ -70,11 +52,7 @@ const App = () => {
           />
         </>
       ) : (
-        <JoinCreateRoom
-          uuid={uuid}
-          setRoomJoined={setRoomJoined}
-          setUser={setUser}
-        />
+        <JoinCreateRoom uuid={uuid} setRoomJoined={setRoomJoined} setUser={setUser} />
       )}
     </div>
   );
