@@ -34,6 +34,22 @@ io.on("connection", (socket) => {
     socket.emit("whiteboardData", mergedElements);
   });
 
+  // NEW: Handle real-time pen movement
+  socket.on("penMove", ({ roomId, x, y, color, tool }) => {
+    const user = getUsers(roomId).find(u => u.id === socket.id);
+    if (user) {
+      // Broadcast to others in room (exclude sender)
+      socket.broadcast.to(roomId).emit("penMove", {
+        id: socket.id,
+        username: user.username,
+        x,
+        y,
+        color,
+        tool
+      });
+    }
+  });
+
   socket.on("drawing", ({ roomId, elements }) => {
     const user = getUsers(roomId).find(u => u.id === socket.id);
     if (user && Array.isArray(elements)) {

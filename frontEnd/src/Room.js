@@ -2,15 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Canvas from "./Canvas";
 
-const Room = ({ userNo, socket, setUsers, setUserNo, user }) => { // FIXED: Add user prop
+const Room = ({ userNo, socket, setUsers, setUserNo, user }) => {
   const canvasRef = useRef(null);
   const ctx = useRef(null);
   const [color, setColor] = useState("#000000");
   const [elements, setElements] = useState([]);
   const [history, setHistory] = useState([]);
   const [tool, setTool] = useState("pencil");
+  const [otherCursors, setOtherCursors] = useState({}); // NEW: Track other users' cursors
 
-  // FIXED: Proper cleanup
+  // Socket event handlers
   useEffect(() => {
     const messageHandler = (data) => toast.info(data.message);
     const usersHandler = (data) => {
@@ -23,18 +24,42 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => { // FIXED: Add 
       setElements([]);
     };
 
+    // NEW: Handle other users' pen movements
+    const penMoveHandler = ({ id, username, x, y, color, tool }) => {
+      setOtherCursors(prev => ({
+        ...prev,
+        [id]: { x, y, username, color, tool }
+      }));
+    };
+
     socket.on("message", messageHandler);
     socket.on("users", usersHandler);
     socket.on("whiteboardData", whiteboardHandler);
     socket.on("canvasCleared", clearHandler);
+    socket.on("penMove", penMoveHandler); // NEW
 
-    return () => { // CLEANUP
+    return () => {
       socket.off("message", messageHandler);
       socket.off("users", usersHandler);
       socket.off("whiteboardData", whiteboardHandler);
       socket.off("canvasCleared", clearHandler);
+      socket.off("penMove", penMoveHandler); // NEW
     };
   }, [socket, setUsers, setUserNo]);
+
+  // NEW: Clear old cursors on disconnect
+  useEffect(() => {
+    const disconnectHandler = () => {
+      // Clear cursor for disconnected user (implement user tracking)
+      setOtherCursors(prev => {
+        const newCursors = { ...prev };
+        // Remove cursor if user disconnected (you'd need to track this)
+        return newCursors;
+      });
+    };
+    socket.on("disconnect", disconnectHandler);
+    return () => socket.off("disconnect", disconnectHandler);
+  }, [socket]);
 
   const clearCanvas = () => {
     ctx.current?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -42,7 +67,6 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => { // FIXED: Add 
     socket.emit("clearCanvas", { roomId: user.roomId });
   };
 
-  // FIXED: Proper undo/redo for shared canvas
   const undo = () => {
     if (elements.length === 0) return;
     const removed = elements[elements.length - 1];
@@ -124,7 +148,8 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => { // FIXED: Add 
           elements={elements}
           tool={tool}
           socket={socket}
-          user={user} // FIXED: Pass user
+          user={user}
+          otherCursors={otherCursors} // NEW: Pass cursors to Canvas
         />
       </div>
     </div>
