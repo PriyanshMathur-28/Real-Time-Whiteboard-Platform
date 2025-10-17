@@ -4,9 +4,9 @@ const Sidebar = ({ users, user, socket }) => {
   const sideBarRef = useRef(null);
 
   const openSideBar = () => {
-    sideBarRef.current.style.left = 0;
+    sideBarRef.current.style.left = "0";
   };
-  
+
   const closeSideBar = () => {
     sideBarRef.current.style.left = "-100%";
   };
@@ -37,12 +37,16 @@ const Sidebar = ({ users, user, socket }) => {
           Close
         </button>
         <div className="w-100 mt-5">
-          {users.map((usr) => ( // FIXED: Direct map, no index
-            <p key={usr.id} className="text-white text-center py-2"> {/* FIXED: Use id */}
-              {usr.userName} {/* FIXED: Correct property */}
-              {usr.id === socket.id && " - (You)"}
-            </p>
-          ))}
+          {users.length > 0 ? ( // Safeguard against empty array
+            users.map((usr) => (
+              <p key={usr.id} className="text-white text-center py-2">
+                {usr.username} {/* FIXED: Use username instead of userName */}
+                {usr.id === socket.id && " - (You)"}
+              </p>
+            ))
+          ) : (
+            <p className="text-white text-center py-2">No users</p> // Debug fallback
+          )}
         </div>
       </div>
     </>
