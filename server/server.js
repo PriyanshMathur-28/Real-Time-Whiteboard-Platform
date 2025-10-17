@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.NODE_ENV === "production" ? "https://your-vercel-url.vercel.app" : "http://localhost:3000",
+    origin: process.env.NODE_ENV === "production" ? "https://real-time-whiteboard-platform-vzfs.vercel.app/" : "http://localhost:3000",
     methods: ["GET", "POST"]
   }
 });
