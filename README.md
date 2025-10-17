@@ -1,9 +1,10 @@
-# 🎨 Real-Time Whiteboard Sharing App 
+# 🎨 Real-Time Whiteboard Sharing App
 
 ## 🌟 Overview
 Welcome to the **Real-Time Whiteboard Sharing App** — a collaborative, real-time whiteboard built with **React**, **Node.js**, and **Socket.IO**.  
 Multiple users can join shared rooms, draw together using a variety of tools, and see updates instantly. Perfect for **team brainstorming**, **remote learning**, or **creative collaboration**.
 
+---
 
 ## ✨ Features
 
@@ -13,8 +14,9 @@ Multiple users can join shared rooms, draw together using a variety of tools, an
 - **🔗 Room Creation & Joining:** Generate unique room IDs or join existing ones seamlessly.  
 - **↩️ Undo / Redo:** Step backward or forward through your drawing history.  
 - **🧹 Clear Canvas:** Reset the whiteboard for a fresh start — updates instantly for all users.  
-- **📱 Responsive Design:** Works beautifully on desktops, tablets, and mobile devices.
-- 
+- **📱 Responsive Design:** Works beautifully on desktops, tablets, and mobile devices.  
+
+---
 
 ## 🛠️ Prerequisites
 
@@ -24,6 +26,7 @@ Before you begin, make sure you have:
 - **npm** (v6.x or later)  
 - A basic understanding of **React**, **Node.js**, and **Socket.IO**
 
+---
 
 ## 🚀 Installation
 
@@ -42,7 +45,7 @@ node server.js
 
 > The server will be live at: [http://localhost:5000](http://localhost:5000)
 
-
+---
 
 ### 💻 Frontend Setup
 
@@ -60,6 +63,7 @@ npm run dev
 > The frontend will be accessible at: [http://localhost:3000](http://localhost:3000)  
 > **Note:** Ensure your `package.json` includes a `dev` script (e.g., `"dev": "react-scripts start"`). If not, use `npm start` as a fallback.
 
+---
 
 ## 🎮 Usage
 
@@ -70,6 +74,7 @@ npm run dev
 5. Click **Users** to view a list of currently active participants  
 6. Use **Undo**, **Redo**, or **Clear Canvas** to manage your drawing space  
 
+---
 
 ## 📂 Project Structure
 
@@ -115,7 +120,7 @@ Real-time-Whiteboard-Platform/
 
 * **CSS** – enhanced with **Bootstrap** for a clean, responsive design  
 
-
+---
 
 ## 🤝 Contributing
 
