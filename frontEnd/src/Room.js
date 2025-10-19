@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react"; // FIXED: Added useCallback import
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Canvas from "./Canvas";
 
@@ -11,15 +11,6 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => {
   const [tool, setTool] = useState("pencil");
   const [otherCursors, setOtherCursors] = useState({}); // NEW: Track other users' cursors
 
-  // FIXED: useCallback for whiteboardHandler with diffing
-  const whiteboardHandler = useCallback((data) => {
-    // FIXED: Only update if data is different (prevents unnecessary re-renders)
-    setElements(prev => {
-      if (JSON.stringify(prev) === JSON.stringify(data)) return prev;
-      return data;
-    });
-  }, []);
-
   // Socket event handlers
   useEffect(() => {
     const messageHandler = (data) => toast.info(data.message);
@@ -27,33 +18,34 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => {
       setUsers(data);
       setUserNo(data.length);
     };
+    const whiteboardHandler = (data) => setElements(data);
     const clearHandler = () => {
       ctx.current?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       setElements([]);
     };
 
     // NEW: Handle other users' pen movements
-    // const penMoveHandler = ({ id, username, x, y, color, tool }) => {
-    //   setOtherCursors(prev => ({
-    //     ...prev,
-    //     [id]: { x, y, username, color, tool }
-    //   }));
-    // };
+    const penMoveHandler = ({ id, username, x, y, color, tool }) => {
+      setOtherCursors(prev => ({
+        ...prev,
+        [id]: { x, y, username, color, tool }
+      }));
+    };
 
     socket.on("message", messageHandler);
     socket.on("users", usersHandler);
-    socket.on("whiteboardData", whiteboardHandler); // FIXED: Use callback
+    socket.on("whiteboardData", whiteboardHandler);
     socket.on("canvasCleared", clearHandler);
-    // socket.on("penMove", penMoveHandler); // NEW
+    socket.on("penMove", penMoveHandler); // NEW
 
     return () => {
       socket.off("message", messageHandler);
       socket.off("users", usersHandler);
-      socket.off("whiteboardData", whiteboardHandler); // FIXED: Off callback
+      socket.off("whiteboardData", whiteboardHandler);
       socket.off("canvasCleared", clearHandler);
-      // socket.off("penMove", penMoveHandler); // NEW
+      socket.off("penMove", penMoveHandler); // NEW
     };
-  }, [socket, setUsers, setUserNo, whiteboardHandler]); // FIXED: Added whiteboardHandler to deps
+  }, [socket, setUsers, setUserNo]);
 
   // NEW: Clear old cursors on disconnect
   useEffect(() => {

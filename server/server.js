@@ -10,7 +10,7 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === "production" ? "https://real-time-whiteboard-platform-priyansh.vercel.app/" : "http://localhost:3000",
     methods: ["GET", "POST"]
-  } 
+  }
 });
 
 // Health check for Render
@@ -35,35 +35,31 @@ io.on("connection", (socket) => {
   });
 
   // NEW: Handle real-time pen movement
-  // socket.on("penMove", ({ roomId, x, y, color, tool }) => {
-  //   const user = getUsers(roomId).find(u => u.id === socket.id);
-  //   if (user) {
-  //     // Broadcast to others in room (exclude sender)
-  //     socket.broadcast.to(roomId).emit("penMove", {
-  //       id: socket.id,
-  //       username: user.username,
-  //       x,
-  //       y,
-  //       color,
-  //       tool
-  //     });
-  //   }
-  // }); 
+  socket.on("penMove", ({ roomId, x, y, color, tool }) => {
+    const user = getUsers(roomId).find(u => u.id === socket.id);
+    if (user) {
+      // Broadcast to others in room (exclude sender)
+      socket.broadcast.to(roomId).emit("penMove", {
+        id: socket.id,
+        username: user.username,
+        x,
+        y,
+        color,
+        tool
+      });
+    }
+  });
 
-socket.on("drawing", ({ roomId, elements }) => {
-  const user = getUsers(roomId).find(u => u.id === socket.id);
-  if (user && Array.isArray(elements)) {
-    if (!roomData[roomId]) roomData[roomId] = { users: {} };
-    roomData[roomId].users[socket.id] = elements;
-    
-    // DEBOUNCE: Only broadcast every 150ms
-    if (!socket.lastBroadcast || Date.now() - socket.lastBroadcast > 150) {
-      socket.lastBroadcast = Date.now();
+  socket.on("drawing", ({ roomId, elements }) => {
+    const user = getUsers(roomId).find(u => u.id === socket.id);
+    if (user && Array.isArray(elements)) {
+      if (!roomData[roomId]) roomData[roomId] = { users: {} };
+      roomData[roomId].users[socket.id] = elements;
       const merged = Object.values(roomData[roomId].users).flat();
       socket.broadcast.to(roomId).emit("whiteboardData", merged);
     }
-  }
-});
+  });
+
   socket.on("clearCanvas", ({ roomId }) => {
     const user = getUsers(roomId).find(u => u.id === socket.id);
     if (user) {
