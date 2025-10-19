@@ -96,39 +96,43 @@ const Canvas = ({
     }
   };
 
+  // FIXED: Optimized useLayoutEffect - depend on length only, use RAF
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !ctx.current) return;
+    if (!canvas || !ctx.current || elements.length === 0) return;
 
     const roughCanvas = rough.canvas(canvas);
-    ctx.current.clearRect(0, 0, canvas.width, canvas.height); // Clear only drawing layer
-
-    elements.forEach((ele) => {
-      if (ele.element === "rect") {
-        roughCanvas.draw(
-          generator.rectangle(ele.offsetX, ele.offsetY, ele.width || 0, ele.height || 0, {
+    
+    requestAnimationFrame(() => { // FIXED: Use RAF for smoother, non-blocking renders
+      ctx.current.clearRect(0, 0, canvas.width, canvas.height);
+      
+      elements.forEach((ele) => {
+        if (ele.element === "rect") {
+          roughCanvas.draw(
+            generator.rectangle(ele.offsetX, ele.offsetY, ele.width || 0, ele.height || 0, {
+              stroke: ele.stroke,
+              roughness: 0,
+              strokeWidth: 5,
+            })
+          );
+        } else if (ele.element === "line") {
+          roughCanvas.draw(
+            generator.line(ele.offsetX, ele.offsetY, ele.endX || ele.offsetX, ele.endY || ele.offsetY, {
+              stroke: ele.stroke,
+              roughness: 0,
+              strokeWidth: 5,
+            })
+          );
+        } else if (ele.element === "pencil") {
+          roughCanvas.linearPath(ele.path || [[ele.offsetX, ele.offsetY]], {
             stroke: ele.stroke,
             roughness: 0,
             strokeWidth: 5,
-          })
-        );
-      } else if (ele.element === "line") {
-        roughCanvas.draw(
-          generator.line(ele.offsetX, ele.offsetY, ele.endX || ele.offsetX, ele.endY || ele.offsetY, {
-            stroke: ele.stroke,
-            roughness: 0,
-            strokeWidth: 5,
-          })
-        );
-      } else if (ele.element === "pencil") {
-        roughCanvas.linearPath(ele.path || [[ele.offsetX, ele.offsetY]], {
-          stroke: ele.stroke,
-          roughness: 0,
-          strokeWidth: 5,
-        });
-      }
+          });
+        }
+      });
     });
-  }, [elements]);
+  }, [elements.length]); // FIXED: Depend on LENGTH only to avoid full array comparison overhead
 
   useEffect(() => {
     const cursorCanvas = cursorCanvasRef.current;
@@ -154,6 +158,7 @@ const Canvas = ({
     });
   }, [otherCursors]);
 
+  // FIXED: Increased throttling to 150ms
   const handleMouseMove = (e) => {
     if (!isDrawing) return;
     const { offsetX, offsetY } = getMousePos(e);
@@ -172,7 +177,7 @@ const Canvas = ({
     );
 
     const now = Date.now();
-    if (now - lastEmit >= 100 && user && socket && user.roomId) { // Increased to 100ms
+    if (now - lastEmit >= 150) { // FIXED: Increased to 150ms
       lastEmit = now;
       const currentElement = elements.find((ele) => ele.id === currentElementId.current);
       if (currentElement) {

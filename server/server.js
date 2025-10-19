@@ -50,16 +50,20 @@ io.on("connection", (socket) => {
   //   }
   // }); 
 
-  socket.on("drawing", ({ roomId, elements }) => {
-    const user = getUsers(roomId).find(u => u.id === socket.id);
-    if (user && Array.isArray(elements)) {
-      if (!roomData[roomId]) roomData[roomId] = { users: {} };
-      roomData[roomId].users[socket.id] = elements;
+socket.on("drawing", ({ roomId, elements }) => {
+  const user = getUsers(roomId).find(u => u.id === socket.id);
+  if (user && Array.isArray(elements)) {
+    if (!roomData[roomId]) roomData[roomId] = { users: {} };
+    roomData[roomId].users[socket.id] = elements;
+    
+    // DEBOUNCE: Only broadcast every 150ms
+    if (!socket.lastBroadcast || Date.now() - socket.lastBroadcast > 150) {
+      socket.lastBroadcast = Date.now();
       const merged = Object.values(roomData[roomId].users).flat();
       socket.broadcast.to(roomId).emit("whiteboardData", merged);
     }
-  });
-
+  }
+});
   socket.on("clearCanvas", ({ roomId }) => {
     const user = getUsers(roomId).find(u => u.id === socket.id);
     if (user) {
