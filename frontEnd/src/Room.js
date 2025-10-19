@@ -25,18 +25,18 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => {
     };
 
     // NEW: Handle other users' pen movements
-    const penMoveHandler = ({ id, username, x, y, color, tool }) => {
-      setOtherCursors(prev => ({
-        ...prev,
-        [id]: { x, y, username, color, tool }
-      }));
-    };
+    // const penMoveHandler = ({ id, username, x, y, color, tool }) => {
+    //   setOtherCursors(prev => ({
+    //     ...prev,
+    //     [id]: { x, y, username, color, tool }
+    //   }));
+    // };
 
     socket.on("message", messageHandler);
     socket.on("users", usersHandler);
     socket.on("whiteboardData", whiteboardHandler);
     socket.on("canvasCleared", clearHandler);
-    socket.on("penMove", penMoveHandler); // NEW
+    // socket.on("penMove", penMoveHandler); // NEW
 
     return () => {
       socket.off("message", messageHandler);
