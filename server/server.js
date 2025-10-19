@@ -10,7 +10,7 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === "production" ? "https://real-time-whiteboard-platform-priyansh.vercel.app/" : "http://localhost:3000",
     methods: ["GET", "POST"]
-  }
+  } 
 });
 
 // Health check for Render
@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
         tool
       });
     }
-  });
+  }); 
 
   socket.on("drawing", ({ roomId, elements }) => {
     const user = getUsers(roomId).find(u => u.id === socket.id);
