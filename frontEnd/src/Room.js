@@ -9,57 +9,31 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => {
   const [elements, setElements] = useState([]);
   const [history, setHistory] = useState([]);
   const [tool, setTool] = useState("pencil");
-  const [otherCursors, setOtherCursors] = useState({}); // NEW: Track other users' cursors
 
-  // Socket event handlers
   useEffect(() => {
     const messageHandler = (data) => toast.info(data.message);
     const usersHandler = (data) => {
       setUsers(data);
       setUserNo(data.length);
     };
-    const whiteboardHandler = (data) => setElements(data);
+    const whiteboardHandler = (data) => setElements(data); // ✅ Simple - full sync
     const clearHandler = () => {
       ctx.current?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       setElements([]);
-    };
-
-    // NEW: Handle other users' pen movements
-    const penMoveHandler = ({ id, username, x, y, color, tool }) => {
-      setOtherCursors(prev => ({
-        ...prev,
-        [id]: { x, y, username, color, tool }
-      }));
     };
 
     socket.on("message", messageHandler);
     socket.on("users", usersHandler);
     socket.on("whiteboardData", whiteboardHandler);
     socket.on("canvasCleared", clearHandler);
-    socket.on("penMove", penMoveHandler); // NEW
 
     return () => {
       socket.off("message", messageHandler);
       socket.off("users", usersHandler);
       socket.off("whiteboardData", whiteboardHandler);
       socket.off("canvasCleared", clearHandler);
-      socket.off("penMove", penMoveHandler); // NEW
     };
   }, [socket, setUsers, setUserNo]);
-
-  // NEW: Clear old cursors on disconnect
-  useEffect(() => {
-    const disconnectHandler = () => {
-      // Clear cursor for disconnected user (implement user tracking)
-      setOtherCursors(prev => {
-        const newCursors = { ...prev };
-        // Remove cursor if user disconnected (you'd need to track this)
-        return newCursors;
-      });
-    };
-    socket.on("disconnect", disconnectHandler);
-    return () => socket.off("disconnect", disconnectHandler);
-  }, [socket]);
 
   const clearCanvas = () => {
     ctx.current?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -149,7 +123,6 @@ const Room = ({ userNo, socket, setUsers, setUserNo, user }) => {
           tool={tool}
           socket={socket}
           user={user}
-          otherCursors={otherCursors} // NEW: Pass cursors to Canvas
         />
       </div>
     </div>

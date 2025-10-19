@@ -68,7 +68,7 @@ const JoinCreateRoom = ({ uuid, setUser, setRoomJoined }) => {
                 style={{
                   boxShadow: "none",
                   zIndex: "0 !important",
-                  fontSize: "0.89rem !important", // FIXED: camelCase
+                  fontSize: "0.89rem !important",
                 }}
               />
               <div className="input-group-append">

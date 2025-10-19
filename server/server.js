@@ -10,12 +10,13 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === "production" ? "https://real-time-whiteboard-platform-priyansh.vercel.app/" : "http://localhost:3000",
     methods: ["GET", "POST"]
-  }
+  } 
 });
 
-// Health check for Render
-app.head("/", (req, res) => res.status(200).send());  // Empty 200 OK for HEAD
+app.head("/", (req, res) => res.status(200).send());
 app.get("/", (req, res) => res.send("server"));
+
+let roomData = {};
 
 io.on("connection", (socket) => {
   socket.on("user-joined", (data) => {
@@ -34,29 +35,14 @@ io.on("connection", (socket) => {
     socket.emit("whiteboardData", mergedElements);
   });
 
-  // NEW: Handle real-time pen movement
-  socket.on("penMove", ({ roomId, x, y, color, tool }) => {
-    const user = getUsers(roomId).find(u => u.id === socket.id);
-    if (user) {
-      // Broadcast to others in room (exclude sender)
-      socket.broadcast.to(roomId).emit("penMove", {
-        id: socket.id,
-        username: user.username,
-        x,
-        y,
-        color,
-        tool
-      });
-    }
-  });
-
+  // ✅ RESTORED: ONLY FINAL ELEMENTS (no during-drawing updates)
   socket.on("drawing", ({ roomId, elements }) => {
     const user = getUsers(roomId).find(u => u.id === socket.id);
     if (user && Array.isArray(elements)) {
       if (!roomData[roomId]) roomData[roomId] = { users: {} };
       roomData[roomId].users[socket.id] = elements;
       const merged = Object.values(roomData[roomId].users).flat();
-      socket.broadcast.to(roomId).emit("whiteboardData", merged);
+      socket.broadcast.to(roomId).emit("whiteboardData", merged); // INSTANT final sync
     }
   });
 
@@ -82,8 +68,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-
-let roomData = {};  // Moved outside io.on for persistence
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, '0.0.0.0', () => console.log(`Server listening on port ${PORT}`));

@@ -12,13 +12,11 @@ const Canvas = ({
   tool,
   socket,
   user,
-  otherCursors,
 }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const currentElementId = useRef(null);
   const cursorCanvasRef = useRef(null);
   const cursorCtx = useRef(null);
-  let lastEmit = 0; // For throttling
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -37,7 +35,6 @@ const Canvas = ({
     context.lineWidth = 5;
     ctx.current = context;
 
-    // Initialize cursor canvas with higher z-index
     const cursorCanvas = cursorCanvasRef.current;
     cursorCanvas.width = width;
     cursorCanvas.height = height;
@@ -47,7 +44,7 @@ const Canvas = ({
     cursorCanvas.style.top = "0";
     cursorCanvas.style.left = "0";
     cursorCanvas.style.pointerEvents = "none";
-    cursorCanvas.style.zIndex = "10"; // Ensure cursor canvas is on top
+    cursorCanvas.style.zIndex = "10";
     cursorCtx.current = cursorCanvas.getContext("2d");
   }, []);
 
@@ -87,11 +84,34 @@ const Canvas = ({
     setElements((prevElements) => [...prevElements, newElement]);
     currentElementId.current = newElement.id;
     setIsDrawing(true);
-    socket.emit("drawing", { roomId: user.roomId, elements: [newElement] });
+    // ✅ NO EMIT during mousedown
   };
 
-  const sendDrawing = () => {
+  // ✅ REMOVED: No mouseMove emit (local only)
+  const handleMouseMove = (e) => {
+    if (!isDrawing) return;
+    const { offsetX, offsetY } = getMousePos(e);
+
+    setElements((prevElements) =>
+      prevElements.map((ele) =>
+        ele.id === currentElementId.current
+          ? {
+              ...ele,
+              ...(tool === "rect" && { width: offsetX - ele.offsetX, height: offsetY - ele.offsetY }),
+              ...(tool === "line" && { endX: offsetX, endY: offsetY }),
+              ...(tool === "pencil" && { path: [...ele.path, [offsetX, offsetY]] }),
+            }
+          : ele
+      )
+    );
+    // ✅ NO EMIT during mouseMove - LOCAL ONLY!
+  };
+
+  // ✅ RESTORED: ONLY emit on mouseUp (FINAL)
+  const handleMouseUp = () => {
+    setIsDrawing(false);
     if (socket && user.roomId && elements.length > 0) {
+      // Send COMPLETE elements array (all final strokes)
       socket.emit("drawing", { roomId: user.roomId, elements });
     }
   };
@@ -101,7 +121,7 @@ const Canvas = ({
     if (!canvas || !ctx.current) return;
 
     const roughCanvas = rough.canvas(canvas);
-    ctx.current.clearRect(0, 0, canvas.width, canvas.height); // Clear only drawing layer
+    ctx.current.clearRect(0, 0, canvas.width, canvas.height);
 
     elements.forEach((ele) => {
       if (ele.element === "rect") {
@@ -129,62 +149,6 @@ const Canvas = ({
       }
     });
   }, [elements]);
-
-  useEffect(() => {
-    const cursorCanvas = cursorCanvasRef.current;
-    if (!cursorCanvas || !cursorCtx.current) return;
-
-    // Clear and redraw cursors only when they change
-    cursorCtx.current.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
-    console.log("Redrawing cursors:", otherCursors); // Debug log
-
-    Object.entries(otherCursors).forEach(([userId, cursor]) => {
-      const { x, y, username, color: cursorColor } = cursor;
-      cursorCtx.current.beginPath();
-      cursorCtx.current.arc(x, y, 8, 0, 2 * Math.PI);
-      cursorCtx.current.fillStyle = cursorColor || "#ff0000";
-      cursorCtx.current.fill();
-      cursorCtx.current.strokeStyle = cursorColor || "#ff0000";
-      cursorCtx.current.lineWidth = 2;
-      cursorCtx.current.stroke();
-      cursorCtx.current.closePath();
-      cursorCtx.current.fillStyle = "white";
-      cursorCtx.current.font = "12px Arial";
-      cursorCtx.current.fillText(username?.substring(0, 3) || "U", x + 10, y - 5);
-    });
-  }, [otherCursors]);
-
-  const handleMouseMove = (e) => {
-    if (!isDrawing) return;
-    const { offsetX, offsetY } = getMousePos(e);
-
-    setElements((prevElements) =>
-      prevElements.map((ele) =>
-        ele.id === currentElementId.current
-          ? {
-              ...ele,
-              ...(tool === "rect" && { width: offsetX - ele.offsetX, height: offsetY - ele.offsetY }),
-              ...(tool === "line" && { endX: offsetX, endY: offsetY }),
-              ...(tool === "pencil" && { path: [...ele.path, [offsetX, offsetY]] }),
-            }
-          : ele
-      )
-    );
-
-    const now = Date.now();
-    if (now - lastEmit >= 100 && user && socket && user.roomId) { // Increased to 100ms
-      lastEmit = now;
-      const currentElement = elements.find((ele) => ele.id === currentElementId.current);
-      if (currentElement) {
-        socket.emit("drawing", { roomId: user.roomId, elements: [currentElement] });
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDrawing(false);
-    sendDrawing();
-  };
 
   return (
     <div

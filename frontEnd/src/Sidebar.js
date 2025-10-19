@@ -37,15 +37,15 @@ const Sidebar = ({ users, user, socket }) => {
           Close
         </button>
         <div className="w-100 mt-5">
-          {users.length > 0 ? ( // Safeguard against empty array
+          {users.length > 0 ? (
             users.map((usr) => (
               <p key={usr.id} className="text-white text-center py-2">
-                {usr.username} {/* FIXED: Use username instead of userName */}
+                {usr.username}
                 {usr.id === socket.id && " - (You)"}
               </p>
             ))
           ) : (
-            <p className="text-white text-center py-2">No users</p> // Debug fallback
+            <p className="text-white text-center py-2">No users</p>
           )}
         </div>
       </div>

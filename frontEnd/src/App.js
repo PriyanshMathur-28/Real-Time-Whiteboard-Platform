@@ -10,7 +10,7 @@ const App = () => {
   const [userNo, setUserNo] = useState(0);
   const [roomJoined, setRoomJoined] = useState(false);
   const [user, setUser] = useState({});
-  const [users, setUsers] = useState([]); // State for users list
+  const [users, setUsers] = useState([]);
   const [socket, setSocket] = useState(null);
 
   const uuid = () => {
@@ -24,13 +24,12 @@ const App = () => {
     const newSocket = io(wsUrl, { transports: ["websocket"], reconnectionAttempts: 5, timeout: 10000 });
     setSocket(newSocket);
 
-    // Listen for users event
     newSocket.on("users", (roomUsers) => {
       setUsers(roomUsers);
-      setUserNo(roomUsers.length); // Update user count
+      setUserNo(roomUsers.length);
     });
 
-    return () => newSocket.close(); // Cleanup
+    return () => newSocket.close();
   }, []);
 
   useEffect(() => {
@@ -58,4 +57,4 @@ const App = () => {
   );
 };
 
-export default App; 
+export default App;
