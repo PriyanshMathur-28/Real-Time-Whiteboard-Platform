@@ -1,0 +1,479 @@
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.wb-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffe4e6 25%, #fef3c7 50%, #fff1f2 75%, #fef3c7 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Navigation */
+.wb-nav {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(251, 146, 60, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.wb-nav-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wb-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wb-logo-icon {
+  width: 2rem;
+  height: 2rem;
+  stroke: #f97316;
+  stroke-width: 2;
+}
+
+.wb-logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f97316 0%, #e11d48 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero Section */
+.wb-hero {
+  padding: 5rem 2rem;
+}
+
+.wb-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Badge */
+.wb-badge-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #f97316 0%, #e11d48 100%);
+  color: white;
+  padding: 0.625rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.3);
+}
+
+.wb-badge-icon {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* Title */
+.wb-title {
+  font-size: 4.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #ea580c 0%, #e11d48 50%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeIn 1s ease-out 0.2s both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtitle */
+.wb-subtitle {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: #6b7280;
+  text-align: center;
+  max-width: 48rem;
+  margin: 0 auto 4rem;
+  animation: fadeIn 1s ease-out 0.4s both;
+}
+
+/* Cards Grid */
+.wb-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 3rem;
+  max-width: 1100px;
+  margin: 0 auto 3rem;
+  animation: fadeIn 1s ease-out 0.6s both;
+}
+
+/* Card Styles */
+.wb-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wb-card:hover {
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+.wb-card-hovered {
+  transform: translateY(-12px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
+}
+
+/* Card Glow Effect */
+.wb-card-glow {
+  position: absolute;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.wb-glow-orange {
+  background: linear-gradient(135deg, #f97316 0%, #e11d48 100%);
+  top: -8rem;
+  right: -8rem;
+}
+
+.wb-glow-rose {
+  background: linear-gradient(135deg, #e11d48 0%, #f97316 100%);
+  top: -8rem;
+  right: -8rem;
+}
+
+.wb-card-hovered .wb-card-glow {
+  opacity: 0.25;
+}
+
+.wb-card-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Card Icon */
+.wb-card-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease;
+}
+
+.wb-card-hovered .wb-card-icon {
+  transform: scale(1.05) rotate(-3deg);
+}
+
+.wb-icon-orange {
+  background: linear-gradient(135deg, #f97316 0%, #e11d48 100%);
+}
+
+.wb-icon-rose {
+  background: linear-gradient(135deg, #e11d48 0%, #ec4899 100%);
+}
+
+.wb-card-icon svg {
+  width: 2rem;
+  height: 2rem;
+  stroke: white;
+  stroke-width: 2;
+}
+
+/* Card Text */
+.wb-card-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+}
+
+.wb-card-desc {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* Form Styles */
+.wb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.wb-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wb-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.wb-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  font-size: 1rem;
+  color: #1f2937;
+  background: white;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.wb-input::placeholder {
+  color: #9ca3af;
+}
+
+.wb-input:focus {
+  border-color: #fb923c;
+  box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.1);
+}
+
+.wb-room-id {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%);
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 600;
+  user-select: all;
+  flex: 1;
+}
+
+.wb-monospace {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 500;
+}
+
+/* Room ID Group */
+.wb-room-id-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Icon Buttons */
+.wb-btn-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wb-btn-generate {
+  background: transparent;
+  border: 2px solid #f97316;
+  color: #ea580c;
+}
+
+.wb-btn-generate:hover {
+  background: #f97316;
+  color: white;
+  transform: rotate(180deg);
+}
+
+.wb-btn-copy {
+  background: #1f2937;
+  color: white;
+  border: none;
+}
+
+.wb-btn-copy:hover {
+  background: #111827;
+  transform: scale(1.05);
+}
+
+/* Primary Button */
+.wb-btn-primary {
+  width: 100%;
+  padding: 1.125rem 2rem;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.wb-btn-orange {
+  background: linear-gradient(135deg, #f97316 0%, #e11d48 100%);
+}
+
+.wb-btn-rose {
+  background: linear-gradient(135deg, #e11d48 0%, #f97316 100%);
+}
+
+.wb-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.wb-btn-orange:hover {
+  box-shadow: 0 15px 40px rgba(249, 115, 22, 0.4);
+}
+
+.wb-btn-rose:hover {
+  box-shadow: 0 15px 40px rgba(225, 29, 72, 0.4);
+}
+
+.wb-arrow {
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: transform 0.3s ease;
+}
+
+.wb-btn-primary:hover .wb-arrow {
+  transform: translateX(4px);
+}
+
+/* Footer Text */
+.wb-footer-text {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 2rem;
+  animation: fadeIn 1s ease-out 0.8s both;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .wb-cards-grid {
+    grid-template-columns: 1fr;
+    max-width: 550px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wb-hero {
+    padding: 3rem 1.5rem;
+  }
+
+  .wb-title {
+    font-size: 3rem;
+  }
+
+  .wb-subtitle {
+    font-size: 1.125rem;
+  }
+
+  .wb-card {
+    padding: 2rem;
+  }
+
+  .wb-card-title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .wb-nav-content {
+    padding: 1rem 1.5rem;
+  }
+
+  .wb-logo-text {
+    font-size: 1.25rem;
+  }
+
+  .wb-title {
+    font-size: 2.25rem;
+  }
+
+  .wb-subtitle {
+    font-size: 1rem;
+  }
+
+  .wb-card {
+    padding: 1.5rem;
+  }
+
+  .wb-card-title {
+    font-size: 1.5rem;
+  }
+
+  .wb-room-id-group {
+    flex-wrap: wrap;
+  }
+
+  .wb-room-id {
+    width: 100%;
+  }
+
+  .wb-btn-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+}

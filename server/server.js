@@ -1,5 +1,6 @@
 const express = require("express");
 const http = require("http");
+const path = require("path");
 const cors = require("cors");
 const { userJoin, getUsers, userLeave } = require("./utils/user");
 const { Server } = require("socket.io");
@@ -10,11 +11,15 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === "production" ? "https://real-time-whiteboard-platform-priyansh.vercel.app/" : "http://localhost:3000",
     methods: ["GET", "POST"]
-  } 
+  }
 });
 
-app.head("/", (req, res) => res.status(200).send());
-app.get("/", (req, res) => res.send("server"));
+// Serve static files from the dist folder
+app.use(express.static(path.join(__dirname, "project/dist")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "project/dist/index.html"));
+});
 
 let roomData = {};
 
@@ -35,14 +40,13 @@ io.on("connection", (socket) => {
     socket.emit("whiteboardData", mergedElements);
   });
 
-  // ✅ RESTORED: ONLY FINAL ELEMENTS (no during-drawing updates)
   socket.on("drawing", ({ roomId, elements }) => {
     const user = getUsers(roomId).find(u => u.id === socket.id);
     if (user && Array.isArray(elements)) {
       if (!roomData[roomId]) roomData[roomId] = { users: {} };
       roomData[roomId].users[socket.id] = elements;
       const merged = Object.values(roomData[roomId].users).flat();
-      socket.broadcast.to(roomId).emit("whiteboardData", merged); // INSTANT final sync
+      socket.broadcast.to(roomId).emit("whiteboardData", merged);
     }
   });
 
