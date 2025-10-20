@@ -60,6 +60,18 @@ function App() {
     }
   };
 
+  const handleGetStarted = () => {
+    window.open('https://real-time-whiteboard-platform-priyansh.vercel.app/', '_blank');
+  };
+
+  const handleStartCreating = () => {
+    window.open('https://real-time-whiteboard-platform-priyansh.vercel.app/', '_blank');
+  };
+
+  const handleStartDrawing = () => {
+    window.open('https://real-time-whiteboard-platform-priyansh.vercel.app/', '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
       {/* Navbar */}
@@ -72,17 +84,29 @@ function App() {
             <span className="text-xl font-bold tracking-tight">Whiteboard</span>
           </div>
           <div className="hidden md:flex items-center gap-10">
-            <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
+            <button
+              onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+              className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+            >
               Features
-            </a>
-            <a href="#how" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
+            </button>
+            <button
+              onClick={() => document.getElementById('how').scrollIntoView({ behavior: 'smooth' })}
+              className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+            >
               How It Works
-            </a>
-            <a href="#cases" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
+            </button>
+            <button
+              onClick={() => document.getElementById('cases').scrollIntoView({ behavior: 'smooth' })}
+              className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+            >
               Use Cases
-            </a>
-            <button className="px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-all hover:shadow-lg">
-              <a href="https://real-time-whiteboard-platform-priyansh.vercel.app/">Get Started</a>
+            </button>
+            <button
+              onClick={handleGetStarted}
+              className="px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-all hover:shadow-lg"
+            >
+              Get Started
             </button>
           </div>
         </div>
@@ -124,7 +148,10 @@ function App() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="group px-8 py-4 bg-gray-900 text-white rounded-full font-medium text-lg hover:bg-gray-800 transition-all hover:shadow-2xl hover:shadow-gray-900/20 flex items-center gap-2">
+              <button
+                onClick={handleStartCreating}
+                className="group px-8 py-4 bg-gray-900 text-white rounded-full font-medium text-lg hover:bg-gray-800 transition-all hover:shadow-2xl hover:shadow-gray-900/20 flex items-center gap-2"
+              >
                 Start Creating Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -317,10 +344,11 @@ function App() {
           <p className="text-xl text-white/90 mb-12 font-light">
             Join thousands of teams collaborating in real-time
           </p>
-          <button className="px-12 py-5 bg-white text-gray-900 rounded-full font-bold text-xl hover:shadow-2xl hover:scale-105 transition-all">
-            <a href="https://real-time-whiteboard-platform-priyansh.vercel.app/">
-              Start Drawing Now
-            </a>
+          <button
+            onClick={handleStartDrawing}
+            className="px-12 py-5 bg-white text-gray-900 rounded-full font-bold text-xl hover:shadow-2xl hover:scale-105 transition-all"
+          >
+            Start Drawing Now
           </button>
           <p className="text-white/80 mt-8 font-light">
             No credit card/Login required. Free forever.
