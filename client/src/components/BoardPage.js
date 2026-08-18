@@ -168,7 +168,7 @@ const BoardPage = () => {
     // Don't open a socket if we're already flagged as a duplicate tab.
     if (duplicateTab) return;
 
-    const serverUrl = process.env.REACT_APP_SERVER_URL || "http://localhost:5000";
+    const serverUrl = (process.env.REACT_APP_SERVER_URL || "http://localhost:5000").replace(/\/+$/, "");
     const wsUrl = toWsUrl(serverUrl);
 
     const newSocket = io(wsUrl, {

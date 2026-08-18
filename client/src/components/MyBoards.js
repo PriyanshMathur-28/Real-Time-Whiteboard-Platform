@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 import "../css/MyBoards.css";
 
-const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:5000";
+const SERVER_URL = (process.env.REACT_APP_SERVER_URL || "http://localhost:5000").replace(/\/+$/, "");
 const CUSTOM_ID_RE = /^[a-zA-Z0-9-]{4,40}$/;
 
 const uuid = () => {

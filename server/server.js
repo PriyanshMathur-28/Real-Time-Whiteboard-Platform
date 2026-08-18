@@ -62,37 +62,49 @@ mongoose.connection.on("reconnected", () => {
 });
 
 // ── CORS ───────────────────────────────────────────────────────────────────
-// Hard-coding a single deployed URL breaks the moment you deploy a preview
-// URL, add a custom domain, or rename the project — the socket.io handshake
-// gets rejected at the CORS check and every client fails to connect at all
-// (which looks like "whiteboards won't connect", even though every user is
-// affected, not just simultaneous ones). Set CLIENT_URL (comma-separated
-// for multiple origins) in the server's env instead.
-const PROD_ORIGIN = (process.env.CLIENT_URL || "http://localhost:3000")
+const rawClientUrls = (process.env.CLIENT_URL || "http://localhost:3000,http://localhost:3001")
   .split(",")
-  .map((s) => s.trim());
+  .map((s) => s.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true; // Allow non-browser tools, curl, health checks
+  const cleanOrigin = origin.replace(/\/+$/, "");
+  if (rawClientUrls.includes(cleanOrigin)) return true;
+  if (/^http:\/\/localhost:\d+$/.test(cleanOrigin)) return true;
+  if (/^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/.test(cleanOrigin)) return true;
+  return false;
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 const io = new Server(server, {
   cors: {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? PROD_ORIGIN
-        : ["http://localhost:3000", "http://localhost:3001"],
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Socket CORS blocked for origin: ${origin}`));
+      }
+    },
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
-
-// The `cors` package needs to be wired into Express explicitly, or plain
-// HTTP calls (e.g. /api/auth/*) from a deployed frontend are subject to the
-// browser's default same-origin policy and fail. Same allow-list as sockets.
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? PROD_ORIGIN
-        : ["http://localhost:3000", "http://localhost:3001"],
-  })
-);
 
 // ── Auth routes (signup / login / forgot-password / reset-password) ───────
 app.use("/api/auth", authRoutes);
