@@ -198,3 +198,5 @@ whiteboard-app/
 ## 📄 License
 
 This project is open-source and available under the [MIT License](LICENSE).
+#   R e a l - T i m e - W h i t e b o a r d - P l a t f o r m  
+ 
