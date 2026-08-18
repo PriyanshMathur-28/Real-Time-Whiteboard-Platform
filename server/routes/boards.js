@@ -63,7 +63,8 @@ router.get("/", requireAuth, async (req, res) => {
 });
 
 // ── DELETE /api/boards/:roomId ───────────────────────────────────────────────
-// Delete board if owner (or unowned), or remove from participant list if participant.
+// Only the Host (owner) can permanently delete the board.
+// Participants can remove the board from their own dashboard.
 router.delete("/:roomId", requireAuth, async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -73,17 +74,29 @@ router.delete("/:roomId", requireAuth, async (req, res) => {
       return res.status(404).json({ error: "Board not found." });
     }
 
-    // If this user is the owner (or no owner is recorded), delete the board completely
-    if (!board.ownerAccountId || board.ownerAccountId.toString() === accountId.toString()) {
+    // Check if the requester is the host/owner of this board
+    const isHost = !board.ownerAccountId || board.ownerAccountId.toString() === accountId.toString();
+
+    if (isHost) {
+      // Host permanently deletes the entire board and its data
       await Room.deleteOne({ roomId });
+      return res.json({
+        ok: true,
+        isHost: true,
+        message: "Board permanently deleted by host.",
+      });
     } else {
-      // Participant: remove from their saved boards
+      // Non-host participant: remove from their saved boards
       await Room.updateOne(
         { roomId },
         { $pull: { participantAccountIds: accountId } }
       );
+      return res.json({
+        ok: true,
+        isHost: false,
+        message: "Board removed from your dashboard.",
+      });
     }
-    res.json({ ok: true });
   } catch (err) {
     console.error("DELETE /api/boards/:roomId error:", err.message);
     res.status(500).json({ error: "Could not delete board." });

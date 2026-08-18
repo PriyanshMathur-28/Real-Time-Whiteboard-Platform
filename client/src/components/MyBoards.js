@@ -66,20 +66,25 @@ const MyBoards = () => {
     fetchBoards();
   }, [token]);
 
-  const handleDelete = async (roomId) => {
-    if (!window.confirm("Delete this board? This cannot be undone.")) return;
-    setDeletingId(roomId);
+  const handleDelete = async (board) => {
+    const isOwner = board.isOwner;
+    const confirmMessage = isOwner
+      ? `Permanently delete "${board.boardName || board.roomId}"? As the host, this will delete the board for everyone. This cannot be undone.`
+      : `Remove "${board.boardName || board.roomId}" from your dashboard? The host's original board will remain intact.`;
+
+    if (!window.confirm(confirmMessage)) return;
+    setDeletingId(board.roomId);
     try {
-      const res = await fetch(`${SERVER_URL}/api/boards/${roomId}`, {
+      const res = await fetch(`${SERVER_URL}/api/boards/${board.roomId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+      const d = await res.json();
       if (!res.ok) {
-        const d = await res.json();
         throw new Error(d.error || "Could not delete board.");
       }
-      setBoards((prev) => prev.filter((b) => b.roomId !== roomId));
-      toast.success("Board deleted.");
+      setBoards((prev) => prev.filter((b) => b.roomId !== board.roomId));
+      toast.success(d.message || (isOwner ? "Board permanently deleted by host." : "Board removed from your dashboard."));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -270,10 +275,10 @@ const MyBoards = () => {
                   </button>
                   <button
                     className="mb-delete-btn"
-                    onClick={() => handleDelete(board.roomId)}
+                    onClick={() => handleDelete(board)}
                     disabled={deletingId === board.roomId}
-                    title={board.isOwner ? "Delete board" : "Remove from my list"}
-                    aria-label={board.isOwner ? "Delete board" : "Remove from my list"}
+                    title={board.isOwner ? "Delete board (Host)" : "Remove from my dashboard"}
+                    aria-label={board.isOwner ? "Delete board (Host)" : "Remove from my dashboard"}
                   >
                     {deletingId === board.roomId ? (
                       <span className="mb-spinner" />

@@ -417,12 +417,18 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("reaction", { senderId: socket.id, senderName: user.username, emoji });
   });
 
-  // ── clearCanvas ──────────────────────────────────────────────────────────
+  // ── clearCanvas (Host only) ──────────────────────────────────────────────
   socket.on("clearCanvas", ({ roomId }) => {
     if (!roomId) return;
 
     const user = getUsers(roomId).find((u) => u.id === socket.id);
     if (!user) return;
+
+    // Security check: Only the host is permitted to clear the entire canvas
+    if (!user.host) {
+      socket.emit("message", { message: "Only the host can clear the whiteboard." });
+      return;
+    }
 
     if (roomData[roomId]) {
       roomData[roomId].elements = [];

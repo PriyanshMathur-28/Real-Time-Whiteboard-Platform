@@ -137,7 +137,11 @@ const Room = ({ userNo, user, socket, setUsers, setUserNo, setRoomJoined }) => {
   const handleClear = () => {
     if (!socket || !user?.roomId) return;
     if (elements.length === 0) return;
-    if (window.confirm("Clear the whole board for everyone in this room?")) {
+    if (!user?.host) {
+      toast.warning("Only the host can clear the whiteboard.");
+      return;
+    }
+    if (window.confirm("As the host, clear the whole board for everyone in this room?")) {
       socket.emit("clearCanvas", { roomId: user.roomId });
     }
   };
@@ -323,7 +327,12 @@ const Room = ({ userNo, user, socket, setUsers, setUserNo, setRoomJoined }) => {
           <button className="rm-icon-btn" onClick={handleUndo} title="Undo your last stroke" disabled={elements.length === 0}>
             <Undo2 size={17} />
           </button>
-          <button className="rm-icon-btn rm-icon-btn--danger" onClick={handleClear} title="Clear board for everyone" disabled={elements.length === 0}>
+          <button
+            className={`rm-icon-btn rm-icon-btn--danger ${!user?.host ? "rm-btn--disabled" : ""}`}
+            onClick={handleClear}
+            title={user?.host ? "Clear board for everyone (Host only)" : "Only the host can clear the board"}
+            disabled={elements.length === 0 || !user?.host}
+          >
             <Trash2 size={17} />
           </button>
         </div>
