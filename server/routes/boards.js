@@ -28,6 +28,25 @@ router.use((req, res, next) => {
   next();
 });
 
+// ── GET /api/boards/check/:roomId ───────────────────────────────────────────
+// Public endpoint to check if a custom meeting ID already exists anywhere.
+router.get("/check/:roomId", async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    if (!roomId || typeof roomId !== "string") {
+      return res.status(400).json({ error: "Room ID is required." });
+    }
+    const exists = await Room.exists({ roomId: roomId.trim() });
+    return res.json({
+      exists: !!exists,
+      roomId: roomId.trim(),
+    });
+  } catch (err) {
+    console.error("GET /api/boards/check/:roomId error:", err.message);
+    return res.status(500).json({ error: "Could not check room availability." });
+  }
+});
+
 // ── GET /api/boards ──────────────────────────────────────────────────────────
 // Returns boards the logged-in user owns or has participated in,
 // sorted by lastActive desc, limited to 50.

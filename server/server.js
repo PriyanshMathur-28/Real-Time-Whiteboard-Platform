@@ -295,16 +295,28 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // First person into this room since the server started (or restarted):
-    // pull any previously saved board/chat from the database.
+    let isExistingRoom = false;
     if (!roomData[roomId]) {
       const saved = await loadRoomFromDb(roomId);
+      if (saved) isExistingRoom = true;
       roomData[roomId] = {
         elements: saved?.elements || [],
         chat: saved?.chat || [],
         boardName: saved?.boardName || (boardName && typeof boardName === "string" ? boardName.trim() : roomId),
         ownerAccountId: saved?.ownerAccountId || null,
       };
+    } else {
+      isExistingRoom = true;
+    }
+
+    // If client specified that they are creating a new board with a custom ID,
+    // prevent hijacking or overwriting an already existing board.
+    if (data.isCreatingCustom && isExistingRoom && roomData[roomId]?.ownerAccountId && roomData[roomId].ownerAccountId !== (accountId || "").toString()) {
+      socket.emit("join-error", {
+        code: "CUSTOM_ID_EXISTS",
+        message: `This custom meeting ID ("${roomId}") already exists. Please choose a different ID or join this board instead.`,
+      });
+      return;
     }
 
     // Determine host: ONLY the person who created/owns the room is Host.

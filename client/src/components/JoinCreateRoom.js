@@ -6,11 +6,13 @@ import "../css/JoinCreateRoom.css";
 // the literal Socket.IO room name — keep it to characters that are safe in
 // a URL and can't collide with formatting weirdness.
 const CUSTOM_ID_RE = /^[a-zA-Z0-9-]{4,40}$/;
+const SERVER_URL = (process.env.REACT_APP_SERVER_URL || "http://localhost:5000").replace(/\/+$/, "");
 
 const JoinCreateRoom = ({ uuid, setUser, setRoomJoined, account, onLogout, onLoginClick, onSignupClick }) => {
   const [roomId, setRoomId] = useState(uuid());
   const [idMode, setIdMode] = useState("random"); // "random" | "custom"
   const [customIdError, setCustomIdError] = useState("");
+  const [existingCustomId, setExistingCustomId] = useState(null);
   const [name, setName] = useState(account?.name || "");
   const [boardName, setBoardName] = useState("");
   const [joinName, setJoinName] = useState(account?.name || "");
@@ -40,12 +42,14 @@ const JoinCreateRoom = ({ uuid, setUser, setRoomJoined, account, onLogout, onLog
   const handleModeChange = (mode) => {
     setIdMode(mode);
     setCustomIdError("");
+    setExistingCustomId(null);
     if (mode === "random") setRoomId(uuid());
     else setRoomId("");
   };
 
   const handleCustomIdChange = (value) => {
     setRoomId(value.trim());
+    setExistingCustomId(null);
     if (value.trim() && !CUSTOM_ID_RE.test(value.trim())) {
       setCustomIdError("4-40 characters: letters, numbers, and dashes only.");
     } else {
@@ -53,22 +57,38 @@ const JoinCreateRoom = ({ uuid, setUser, setRoomJoined, account, onLogout, onLog
     }
   };
 
-  const handleCreateSubmit = (e) => {
+  const handleCreateSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) {
       toast.error("Please enter your name!");
       return;
     }
-    if (idMode === "custom" && (!roomId.trim() || !CUSTOM_ID_RE.test(roomId.trim()))) {
-      toast.error("Please enter a valid meeting ID (4-40 letters, numbers, or dashes).");
-      return;
+    if (idMode === "custom") {
+      if (!roomId.trim() || !CUSTOM_ID_RE.test(roomId.trim())) {
+        toast.error("Please enter a valid meeting ID (4-40 letters, numbers, or dashes).");
+        return;
+      }
+      try {
+        const res = await fetch(`${SERVER_URL}/api/boards/check/${encodeURIComponent(roomId.trim())}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.exists) {
+            setExistingCustomId(roomId.trim());
+            setCustomIdError(`This custom meeting ID ("${roomId.trim()}") already exists! Please choose another one or join it directly.`);
+            toast.warning(`Custom meeting ID "${roomId.trim()}" already exists. Please choose another one or join it.`);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Could not check room availability:", err);
+      }
     }
 
     setUser({
-      roomId,
+      roomId: roomId.trim(),
       userId: uuid(),
       userName: name.trim(),
-      boardName: boardName.trim() || roomId,
+      boardName: boardName.trim() || roomId.trim(),
       host: true,
       presenter: true,
       accountId: account?.id || account?._id || null,
@@ -343,7 +363,50 @@ const JoinCreateRoom = ({ uuid, setUser, setRoomJoined, account, onLogout, onLog
                         )}
                       </button>
                     </div>
-                    {customIdError && <span className="wb-inline-error">{customIdError}</span>}
+                    {customIdError && (
+                      <div style={{
+                        background: "#fff1f2",
+                        border: "1px solid #fecdd3",
+                        borderRadius: "0.6rem",
+                        padding: "0.6rem 0.75rem",
+                        marginTop: "0.35rem",
+                        fontSize: "0.8rem",
+                        color: "#be123c",
+                        lineHeight: 1.4,
+                      }}>
+                        <p style={{ margin: 0, fontWeight: 500 }}>{customIdError}</p>
+                        {existingCustomId && (
+                          <div style={{ marginTop: "0.5rem" }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setUser({
+                                  roomId: existingCustomId,
+                                  userId: uuid(),
+                                  userName: name.trim() || "User",
+                                  host: false,
+                                  presenter: false,
+                                  accountId: account?.id || account?._id || null,
+                                });
+                                setRoomJoined(true);
+                              }}
+                              style={{
+                                background: "#e11d48",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "0.4rem",
+                                padding: "0.3rem 0.7rem",
+                                fontSize: "0.75rem",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                              }}
+                            >
+                              Join "{existingCustomId}" Instead →
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
                       This exact ID is what you'll share — anyone who enters it lands in the same room.
                     </span>

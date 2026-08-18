@@ -92,15 +92,20 @@ const MyBoards = () => {
     }
   };
 
+  const [isCheckingId, setIsCheckingId] = useState(false);
+  const [existingCustomId, setExistingCustomId] = useState(null);
+
   const handleOpenCreate = () => {
     setCreateBoardName("");
     setCreateIdMode("random");
     setCreateCustomId("");
     setCustomIdError("");
+    setExistingCustomId(null);
+    setIsCheckingId(false);
     setShowCreateModal(true);
   };
 
-  const handleCreateSubmit = (e) => {
+  const handleCreateSubmit = async (e) => {
     e.preventDefault();
     let finalRoomId = "";
     if (createIdMode === "random") {
@@ -112,6 +117,26 @@ const MyBoards = () => {
         return;
       }
       finalRoomId = trimmed;
+
+      // Check if custom ID already exists in MongoDB
+      setIsCheckingId(true);
+      try {
+        const res = await fetch(`${SERVER_URL}/api/boards/check/${encodeURIComponent(finalRoomId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.exists) {
+            setExistingCustomId(finalRoomId);
+            setCustomIdError(`This custom meeting ID ("${finalRoomId}") already exists! Please make another one or join using this custom ID.`);
+            toast.warning(`Custom ID "${finalRoomId}" already exists. Please choose another one or join it.`);
+            setIsCheckingId(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Could not verify room ID availability:", err);
+      } finally {
+        setIsCheckingId(false);
+      }
     }
 
     const boardNameQuery = createBoardName.trim() ? `?name=${encodeURIComponent(createBoardName.trim())}` : "";
@@ -405,7 +430,41 @@ const MyBoards = () => {
                       }}
                     />
                     {customIdError && (
-                      <p style={{ color: "#ef4444", fontSize: "0.75rem", margin: "0.3rem 0 0" }}>{customIdError}</p>
+                      <div style={{
+                        background: "#fef2f2",
+                        border: "1px solid #fecaca",
+                        borderRadius: "0.6rem",
+                        padding: "0.6rem 0.75rem",
+                        marginTop: "0.4rem",
+                        fontSize: "0.8rem",
+                        color: "#b91c1c",
+                        lineHeight: 1.4,
+                      }}>
+                        <p style={{ margin: 0, fontWeight: 500 }}>{customIdError}</p>
+                        {existingCustomId && (
+                          <div style={{ marginTop: "0.5rem" }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowCreateModal(false);
+                                navigate(`/board/${encodeURIComponent(existingCustomId)}`);
+                              }}
+                              style={{
+                                background: "#dc2626",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "0.4rem",
+                                padding: "0.3rem 0.7rem",
+                                fontSize: "0.75rem",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                              }}
+                            >
+                              Join "{existingCustomId}" Instead →
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </>
                 )}
