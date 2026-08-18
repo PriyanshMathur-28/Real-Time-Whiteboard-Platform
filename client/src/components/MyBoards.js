@@ -489,14 +489,16 @@ const MyBoards = () => {
                 </button>
                 <button
                   type="submit"
+                  disabled={isCheckingId}
                   style={{
                     padding: "0.65rem 1.5rem", borderRadius: "0.75rem",
                     border: "none", background: "linear-gradient(135deg, #6d28d9, #4f46e5)",
-                    color: "white", fontWeight: 700, cursor: "pointer",
-                    boxShadow: "0 4px 14px rgba(109, 40, 217, 0.3)"
+                    color: "white", fontWeight: 700, cursor: isCheckingId ? "not-allowed" : "pointer",
+                    boxShadow: "0 4px 14px rgba(109, 40, 217, 0.3)",
+                    opacity: isCheckingId ? 0.7 : 1,
                   }}
                 >
-                  Create & Launch →
+                  {isCheckingId ? "Checking…" : "Create & Launch →"}
                 </button>
               </div>
             </form>
