@@ -1,0 +1,261 @@
+.ap-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0f9ff 100%);
+  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.ap-doodle {
+  position: absolute;
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.ap-doodle-scribble {
+  width: 140px;
+  top: 8%;
+  left: 6%;
+}
+
+.ap-doodle-circle {
+  width: 90px;
+  bottom: 10%;
+  right: 8%;
+}
+
+@media (max-width: 640px) {
+  .ap-doodle {
+    display: none;
+  }
+}
+
+.ap-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid #e0e7ff;
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 50px rgba(109, 40, 217, 0.1);
+  padding: 2.25rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ap-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.ap-logo-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #6d28d9;
+}
+
+.ap-logo-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  letter-spacing: -0.01em;
+}
+
+.ap-tabs {
+  display: flex;
+  background: #f0f4ff;
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.ap-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.6rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ap-tab--active {
+  background: white;
+  color: #6d28d9;
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.1);
+}
+
+.ap-subtitle {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  text-align: center;
+  margin: 0 0 0.5rem;
+}
+
+.ap-desc {
+  font-size: 0.88rem;
+  color: #6b7280;
+  text-align: center;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.ap-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.ap-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ap-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ap-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.ap-input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.65rem;
+  border: 1.5px solid #e0e7ff;
+  font-size: 0.92rem;
+  color: #1e1b4b;
+  background: #f8faff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  box-sizing: border-box;
+}
+
+.ap-input:focus {
+  border-color: #6d28d9;
+  box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.12);
+  background: white;
+}
+
+.ap-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ap-password-wrap .ap-input {
+  padding-right: 3.4rem;
+}
+
+.ap-eye-btn {
+  position: absolute;
+  right: 0.6rem;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.3rem 0.4rem;
+  transition: color 0.15s;
+}
+
+.ap-eye-btn:hover {
+  color: #6d28d9;
+}
+
+.ap-hint {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ap-hint--ok {
+  color: #16a34a;
+}
+
+.ap-hint--warn {
+  color: #9ca3af;
+}
+
+.ap-btn-primary {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(109, 40, 217, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.ap-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(109, 40, 217, 0.36);
+}
+
+.ap-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ap-switch-text {
+  text-align: center;
+  margin: 1.5rem 0 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.ap-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #6d28d9;
+  font-weight: 700;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ap-link-btn:hover {
+  color: #4c1d95;
+}
+
+.ap-sent-box {
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  color: #4c1d95;
+  line-height: 1.5;
+}
+
+.ap-sent-box .ap-link-btn {
+  display: inline-block;
+  margin-top: 0.6rem;
+}

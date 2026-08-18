@@ -1,0 +1,378 @@
+/* ── Global design tokens ─────────────────────────────────────────────── */
+:root {
+  --bg:           #f0f4ff;
+  --surface:      #ffffff;
+  --surface-2:    #f8faff;
+  --accent:       #6d28d9;
+  --accent-light: #ede9fe;
+  --accent-2:     #0891b2;
+  --text-primary: #1e1b4b;
+  --text-muted:   #6b7280;
+  --border:       #e0e7ff;
+  --danger:       #dc2626;
+  --success:      #16a34a;
+}
+
+.rm-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: var(--bg);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-primary);
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+.rm-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.25rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  box-shadow: 0 1px 4px rgba(109, 40, 217, 0.06);
+}
+.rm-topbar-left, .rm-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rm-logo-mark {
+  width: 1.6rem;
+  height: 1.6rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.rm-logo-mark svg { width: 100%; height: 100%; }
+
+.rm-board-name {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rm-room-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.rm-room-id-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--accent-light);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: background 0.15s;
+}
+.rm-room-id-chip:hover { background: #ddd6fe; }
+.rm-monospace { font-family: "SFMono-Regular", Consolas, Menlo, monospace; }
+
+.rm-user-count {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.rm-user-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+  flex-shrink: 0;
+}
+.rm-host-badge {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid #c4b5fd;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Chat topbar button ──────────────────────────────────────────────── */
+.rm-chat-topbar-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.75rem;
+  border-radius: 0.6rem;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+.rm-chat-topbar-btn:hover {
+  background: var(--accent-light);
+  border-color: #c4b5fd;
+  color: var(--accent);
+}
+.rm-chat-topbar-btn--active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.rm-chat-btn-label { display: inline; }
+@media (max-width: 560px) {
+  .rm-chat-btn-label { display: none; }
+}
+
+/* ── Generic icon buttons ────────────────────────────────────────────── */
+.rm-icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.6rem;
+  border-radius: 0.6rem;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.rm-icon-btn:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: #c4b5fd;
+  color: var(--accent);
+}
+.rm-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.rm-icon-btn--danger:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: var(--danger);
+}
+.rm-leave-label { display: inline; }
+@media (max-width: 560px) {
+  .rm-leave-label { display: none; }
+}
+
+/* ── Chat badge ──────────────────────────────────────────────────────── */
+.rm-chat-badge {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.3rem;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--danger);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────── */
+.rm-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  box-shadow: 0 1px 4px rgba(109, 40, 217, 0.04);
+}
+
+.rm-tool-group {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.rm-toolbar-divider {
+  width: 1px;
+  height: 1.6rem;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.rm-toolbar-spacer {
+  flex: 1;
+  min-width: 0.5rem;
+}
+
+.rm-tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 0.55rem;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.rm-tool-btn:hover { background: var(--accent-light); color: var(--accent); }
+.rm-tool-btn--active {
+  background: var(--accent-light);
+  border-color: #c4b5fd;
+  color: var(--accent);
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.15);
+}
+
+.rm-swatch {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+.rm-swatch:hover { transform: scale(1.15); }
+.rm-swatch--active {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.rm-color-input {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  padding: 0;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  background: none;
+  flex-shrink: 0;
+}
+
+.rm-slider-group { gap: 0.5rem; }
+.rm-slider-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.rm-slider {
+  width: 90px;
+  accent-color: var(--accent);
+}
+
+.rm-fill-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rm-reaction-bar {
+  display: flex;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+.rm-reaction-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.3rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.rm-reaction-btn:hover {
+  background: var(--accent-light);
+  transform: scale(1.22);
+}
+
+/* ── Canvas area ─────────────────────────────────────────────────────── */
+.rm-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background: var(--bg);
+  padding: 1rem;
+}
+
+.rm-canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #c4b5fd;
+  pointer-events: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+.rm-canvas-hint svg { width: 2.5rem; height: 2.5rem; }
+
+/* ── In-canvas text overlays ─────────────────────────────────────────── */
+.canvas-text-overlay {
+  pointer-events: all;
+}
+.canvas-overlay-hint {
+  font-size: 0.68rem;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 4px;
+  background: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* ── Floating reactions ─────────────────────────────────────────────── */
+.rm-floating-reaction {
+  position: absolute;
+  bottom: 2rem;
+  pointer-events: none;
+  animation: rm-float-up 1.8s ease-out forwards;
+}
+.rm-floating-emoji {
+  font-size: 2rem;
+  display: inline-block;
+}
+@keyframes rm-float-up {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  15% { opacity: 1; transform: translateY(-20px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-160px) scale(1); }
+}
